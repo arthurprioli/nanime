@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, url_for, redirect
+from flask import Flask, render_template, request, url_for, redirect, flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, logout_user
 
@@ -42,8 +42,11 @@ def register():
     if request.method == "POST":
         user = Users(username=request.form.get("username"),
                      password=request.form.get("password"))
-        db.session.add(user)
-        db.session.commit()
+        try:
+            db.session.add(user)
+            db.session.commit()
+        except:
+            print(f"Erro no registro de usuario {user.username} no banco de dados")
         return redirect(url_for("login"))
     return render_template("sign_up.html")
 
@@ -52,9 +55,12 @@ def login():
     if request.method == "POST":
         user = Users.query.filter_by(username=request.form.get("username")).first()
 
-        if (user.password == request.form.get("password")):
+        if user and (user.password == request.form.get("password")):
             login_user(user)
             return redirect(url_for("home"))
+        else:
+            flash("Usuario ou senha incorretos", 'error')
+            return redirect(url_for("login"))
     return render_template("login.html")
 
 @app.route("/logout")
