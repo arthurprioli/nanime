@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+ <head>
+   <meta charset="utf-8">
+   <title>Base para os Templates</title>
+   <link rel="stylesheet" href="{{ url_for('static',     filename='css/template.css') }}">
+ </head>
+ <body>
+    <header>
+      <div class="container">
+        <h1 class="logo">
+            Nanime
+        </h1>
+        <strong><nav>
+          <ul class="menu">
+            <li><a href="{{ url_for('home') }}">Home</a></li>
+            <li><a href="{{ url_for('animes') }}">Animes</a></li>
+            <li><a href="{{ url_for('login') }}">Login</a></li>
+            <li><a href="{{ url_for('register') }}">Criar conta</a></li>
+          </ul>
+        </nav></strong>
+        {% if current_user.is_authenticated %}
+        <h1>Você está logado</h1>
+        {% else %}
+        <h1>Você não está logado</h1>
+        {% endif %}
+      </div>
+    </header>
+    
+    {% block content %}
+    {% endblock %}
+    
+ </body>
+</html>
