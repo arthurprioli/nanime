@@ -46,7 +46,7 @@ def register():
             db.session.add(user)
             db.session.commit()
         except:
-            print(f"Erro no registro de usuario {user.username} no banco de dados")
+            print(f"Erro no registro do usuário {user.username} no banco de dados")
         return redirect(url_for("login"))
     return render_template("sign_up.html")
 
@@ -59,7 +59,7 @@ def login():
             login_user(user)
             return redirect(url_for("home"))
         else:
-            flash("Usuario ou senha incorretos", 'error')
+            flash("Usuário ou senha incorretos.", 'error')
             return redirect(url_for("login"))
     return render_template("login.html")
 
