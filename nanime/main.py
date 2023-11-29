@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, url_for, redirect, flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, logout_user
+from models import anime
 
 
 app = Flask(__name__)
@@ -36,6 +37,12 @@ def home():
 @app.route("/animes")
 def animes():
     return render_template("lista_animes.html")
+
+@app.route("/search_anime/<anime_name>", methods=["GET", "POST"])
+def search_anime(anime_name):
+    anime.search_anime(anime_name)
+    return render_template("home.html", anime_name=anime_name)
+
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
