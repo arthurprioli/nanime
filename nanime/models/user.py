@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template
 from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
@@ -11,7 +11,7 @@ class User(db.Model):
     username = db.Column(db.String(50), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(80), nullable=False)
-    animes = db.relationship('Anime', backref='user', lazy=True)
+    anime_list = db.relationship('UserAnimeList', backref='user', lazy=True)
 
     def __init__(self, username, email, password):
         self.username = username
@@ -57,7 +57,8 @@ def get_user(user_id):
         'id': user.id,
         'username': user.username,
         'email': user.email,
-        'password': user.password
+        'password': user.password,
+        'anime_list': user.anime_list
     }
     return jsonify(user_data)
 
@@ -92,3 +93,12 @@ def delete_user(user_id):
 if __name__ == '__main__':
     db.create_all()
     app.run(debug=True)
+
+@app.route('/users/<int:user_id>', methods=['GET'])
+def users(user_id):
+    user = User.query.get(user_id)
+    if user:
+        anime_list = user.anime_list
+        return render_template('user_profile.html', user=user, anime_list=anime_list)
+    else:
+        return "Usuário não encontrado", 404

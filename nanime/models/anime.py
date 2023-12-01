@@ -1,9 +1,9 @@
 
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, url_for, redirect
 from flask_sqlalchemy import SQLAlchemy
 import requests
 from flask import render_template
-
+from . import user
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///anime.db'
@@ -25,6 +25,11 @@ class Anime(db.Model):
         self.global_rating = global_rating
         self.streaming_platform = streaming_platform
         self.image_url = image_url
+
+class UserAnimeList(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    anime_id = db.Column(db.Integer, db.ForeignKey('anime.id'), nullable = False)
 
 @app.route('/anime', methods=['GET'])
 def get_all_anime():
@@ -127,3 +132,17 @@ def search_anime(anime_name):
                 return render_template("home.html", anime = new_anime)
         else:
             return render_template("home.html", anime = new_anime)
+
+
+@app.route('/add_anime/<int:user_id>/<int:anime_id>', methods=['POST'])
+def add_anime(user_id, anime_id):
+    user = User.query.get(user_id)
+    anime = Anime.query.get(anime_id)
+
+    if user and anime:
+        user_anime_entry = UserAnimeList(user_id=user.id, anime_id=anime.id)
+        db.session.add(user_anime_entry)
+        db.session.commit()
+    
+    return redirect(url_for('users', user_id=user.id))
+
